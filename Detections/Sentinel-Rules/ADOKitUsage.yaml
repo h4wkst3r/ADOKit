@@ -1,0 +1,22 @@
+id: c6d17dba-47e3-44f7-bbad-893f9ba22877
+name: ADOKit Usage
+description: |
+  'This will alert when attempts are made to use ADOKit against an Azure DevOps instance.'
+severity: High
+status: Available
+requiredDataConnectors: []
+queryFrequency: PT5M
+queryPeriod: PT5M
+triggerOperator: gt
+triggerThreshold: 0
+tactics:
+  - DefenseEvasion
+relevantTechniques:
+  - T1078
+query: |
+  AzureDevOpsAuditing
+  | where UserAgent has_any ("ADOKit-21e233d4334f9703d1a3a42b6e2efd38")
+  | extend timestamp = TimeGenerated, AccountCustomEntity = ActorUPN, IPCustomEntity = IpAddress
+entityMappings: []
+version: 1.0.0
+kind: Scheduled

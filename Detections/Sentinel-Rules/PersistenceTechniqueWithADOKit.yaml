@@ -1,0 +1,29 @@
+id: 5f7c3400-2a2a-4e94-a66d-bed5b77d1720
+name: Persistence Technique with ADOKit
+description: |
+  'This alert is for any time a persistence technique is attempted using ADOKit.'
+severity: High
+status: Available
+requiredDataConnectors: []
+queryFrequency: PT5M
+queryPeriod: PT5M
+triggerOperator: gt
+triggerThreshold: 0
+tactics:
+  - DefenseEvasion
+  - Persistence
+relevantTechniques:
+  - T1078
+  - T1098
+query: |
+  // Allowlisted UPNs should likely stay empty
+  let AllowlistedUpns = datatable(UPN:string)['foo@bar.com', 'test@foo.com'];
+  // Distinct Operation Names that will flag
+  let HasExactBlocklist = datatable(OperationName:string)['Token.SshCreateEvent','Token.PatCreateEvent'];
+  AzureDevOpsAuditing
+  | where (AuthenticationMechanism startswith "S2S_ServicePrincipal" or AuthenticationMechanism startswith "UserAuthToken") and UserAgent has_any ("ADOKit-21e233d4334f9703d1a3a42b6e2efd38") and (OperationName in (HasExactBlocklist)) and ActorUPN !in (AllowlistedUpns)
+  | project TimeGenerated, AuthenticationMechanism, ActorUPN, ActorDisplayName, IpAddress, UserAgent, OperationName, Details, Data
+  | extend timestamp = TimeGenerated, AccountCustomEntity = ActorUPN, IPCustomEntity = IpAddress
+entityMappings: []
+version: 1.0.0
+kind: Scheduled
