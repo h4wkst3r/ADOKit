@@ -91,12 +91,11 @@ namespace ADOKit.Utilities
 
                                         userList.Add(new User(directoryAlias, displayName, principalName, descriptor));
                                     }
-                                    
+                                    descriptor = "";
+                                    directoryAlias = "";
+                                    displayName = "";
+                                    principalName = "";
                                 }
-                                descriptor = "";
-                                directoryAlias = "";
-                                displayName = "";
-                                principalName = "";
 
 
                                 break;
