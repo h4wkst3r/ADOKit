@@ -8,7 +8,7 @@ Full details on the techniques used by ADOKit are in the X-Force Red [whitepaper
 
 
 ## Release
-* Version 1.0 of ADOKit can be found in Releases
+* Version 1.1 of ADOKit can be found in Releases
 
 ## Table of Contents
 
