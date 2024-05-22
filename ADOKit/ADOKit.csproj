@@ -67,6 +67,7 @@
     <Compile Include="Modules\Privesc\GetPipelineSecrets.cs" />
     <Compile Include="Modules\Privesc\GetPipelineVars.cs" />
     <Compile Include="Modules\Privesc\GetServiceConnections.cs" />
+    <Compile Include="Modules\Privesc\GetVariableGroups.cs" />
     <Compile Include="Modules\Privesc\RemoveBuildAdmin.cs" />
     <Compile Include="Modules\Privesc\RemoveCollectionAdmin.cs" />
     <Compile Include="Modules\Privesc\RemoveCollectionBuildAdmin.cs" />
@@ -92,6 +93,7 @@
     <Compile Include="Objects\File.cs" />
     <Compile Include="Objects\Group.cs" />
     <Compile Include="Objects\GroupMember.cs" />
+    <Compile Include="Objects\GroupVariable.cs" />
     <Compile Include="Objects\PatToken.cs" />
     <Compile Include="Objects\Project.cs" />
     <Compile Include="Objects\Repo.cs" />
