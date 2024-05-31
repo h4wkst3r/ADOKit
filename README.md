@@ -38,6 +38,7 @@ Full details on the techniques used by ADOKit are in the X-Force Red [whitepaper
     - [Search Groups](#search-groups)
     - [Get Group Members](#get-group-members)
     - [Get Project Permissions](#get-project-permissions)
+	- [Download Build Logs](#download-build-logs)
   - Persistence
     - [Create PAT](#create-pat)
     - [List PATs](#list-pats)
@@ -110,6 +111,7 @@ Take the below steps to setup Visual Studio in order to compile the project your
   * <b>searchgroup</b> - Search for a given group
   * <b>getgroupmembers</b> - List all group members for a given group
   * <b>getpermissions</b> - Get the permissions for who has access to a given project
+  * <b>downloadbuildlogs</b> - Download the build logs for one or all projects
 * Persistence
   * <b>createpat</b> - Create personal access token for user
   * <b>listpat</b> - List personal access tokens for user
@@ -145,6 +147,8 @@ Take the below steps to setup Visual Studio in order to compile the project your
 * <b>/user:</b> - Perform an action against a specific user. Not applicable to all modules.
 * <b>/id:</b> - Used with persistence modules to perform an action against a specific token ID. Not applicable to all modules.
 * <b>/group:</b> - Perform an action against a specific group. Not applicable to all modules.
+* <b>/reallydownload</b> - Boolean flag, perform all the requests to download build logs (default is to count them first). Only applicable to the `downloadbuildlogs` module.
+* <b>/outfolder</b> - Output folder, only applicable to the `downloadbuildlogs` module.
 
 ## Authentication Options
 
@@ -178,6 +182,7 @@ Recon | `listgroup` |  No |
 Recon | `searchgroup` |  No |
 Recon | `getgroupmembers` |  No |
 Recon | `getpermissions` |  No |
+Recon | `downloadbuildlogs` | No |
 Persistence | `createpat` |  No | 
 Persistence | `listpat` |  No | 
 Persistence | `removepat` |  No | 
@@ -1142,6 +1147,62 @@ GROUP NAME: [MaraudersMap]\Readers
 4/4/23 13:11:18 Finished execution of getpermissions
 
 ```
+
+
+### Download Build Logs
+
+#### Use Case
+
+> *Download the logs of all the pipeline runs (build logs). You can then search offline for information and/or secrets.*
+
+#### Syntax
+
+Provide the `downloadbuildlogs` module along with a `/project:` for a given project to download all the build logs for this project. If you would like to download them for all projects, specify `all` in the `/project:` argument.
+
+By default, this module only counts the number of logs and the corresponding lines that you would download. We recommend to start with that, because the number of HTTP request and the amount of data downloaded can quickly become large. If you have counted and still want to proceed with the download, add the `/reallydownload` flag to the command line. Note that you can also specify a `/outputfolder:` parameter to specify where to place the downloaded files. Otherwise, the current folder will be used.
+
+`ADOKit.exe downloadbuildlogs /credential:apiKey /url:https://dev.azure.com/organizationName /project:"someProject"`
+
+`ADOKit.exe downloadbuildlogs /credential:apiKey /url:https://dev.azure.com/organizationName /project:"all"`
+
+`ADOKit.exe downloadbuildlogs /credential:apiKey /url:https://dev.azure.com/organizationName /project:"someProject" /reallydownload`
+
+`ADOKit.exe downloadbuildlogs /credential:apiKey /url:https://dev.azure.com/organizationName /project:"someProject" /reallydownload /outputfolder:"output"`
+
+`ADOKit.exe downloadbuildlogs /credential:apiKey /url:https://dev.azure.com/organizationName /project:"all"`
+
+
+#### Example Output
+
+```
+C:\> .\ADOKit.exe downloadbuildlogs /outfolder:"output" /project:"someProject" /url:"https://dev.azure.com/organizationName" /credential:apiKey
+
+==================================================
+Module:         downloadbuildlogs
+Auth Type:      API Key
+Project:        OffensivePipeline
+Target URL:     https://dev.azure.com/organizationName/
+
+Timestamp:      31/05/2024 11:56:39
+==================================================
+
+
+[*] INFO: Checking credentials provided
+
+[+] SUCCESS: Credentials provided are VALID.
+
+  Build ID |                Build def. name |     # logs |                                                URL
+-------------------------------------------------------------------------------------------------------------
+       712 |             Release.Something1 |         67 | https://dev.azure.com/organizationName/bff4b5d2-ef36-4b5f-b26b-d83d964c8e00/_apis/build/Builds/712
+       711 |             Release.Something2 |         49 | https://dev.azure.com/organizationName/bff4b5d2-ef36-4b5f-b26b-d83d964c8e00/_apis/build/Builds/711
+       710 |             Release.Something3 |         49 | https://dev.azure.com/organizationName/bff4b5d2-ef36-4b5f-b26b-d83d964c8e00/_apis/build/Builds/710
+       ...
+
+[!] WARNING: If you really want to download the logs, use the /reallydownload flag.
+[!] WARNING: This will download 3065 log files totalling 257082 lines of log.
+```
+
+
 
 ### Add Project Admin
 

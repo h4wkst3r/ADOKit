@@ -19,8 +19,9 @@ namespace ADOKit
         private static string search = "";
         private static string id = "";
         private static string sshKey = "";
-        private static List<string> approvedModules = new List<string> { "check", "whoami", "listrepo", "searchrepo", "listproject", "searchproject", "searchcode", "searchfile", "listuser", "searchuser", "listgroup", "searchgroup", "getgroupmembers", "getpermissions", "createpat", "removepat", "listpat", "createsshkey", "removesshkey", "listsshkey", "addprojectadmin", "removeprojectadmin", "addbuildadmin", "removebuildadmin", "addcollectionadmin", "removecollectionadmin", "addcollectionbuildadmin", "removecollectionbuildadmin", "addcollectionbuildsvc", "removecollectionbuildsvc", "addcollectionsvc", "removecollectionsvc", "getpipelinevars", "getpipelinesecrets", "getvariablegroups", "getserviceconnections" };
-
+        private static string outfolder = "."; // default to local folder
+        private static bool reallyDownload = false; // default just avoiding to download all the things if you don't really want it
+        private static List<string> approvedModules = new List<string> { "check", "whoami", "listrepo", "searchrepo", "listproject", "searchproject", "searchcode", "searchfile", "listuser", "searchuser", "listgroup", "searchgroup", "getgroupmembers", "getpermissions", "downloadbuildlogs", "createpat", "removepat", "listpat", "createsshkey", "removesshkey", "listsshkey", "addprojectadmin", "removeprojectadmin", "addbuildadmin", "removebuildadmin", "addcollectionadmin", "removecollectionadmin", "addcollectionbuildadmin", "removecollectionbuildadmin", "addcollectionbuildsvc", "removecollectionbuildsvc", "addcollectionsvc", "removecollectionsvc", "getpipelinevars", "getpipelinesecrets", "getvariablegroups", "getserviceconnections" };
 
 
         static async Task Main(string[] args)
@@ -123,6 +124,22 @@ namespace ADOKit
 
                 }
 
+                // Output folder
+                if (argDict.ContainsKey("outfolder"))
+                {
+
+                    outfolder = argDict["outfolder"];
+
+                }
+
+                // Really download all the build logs? I assume you know what you're doing
+                if (argDict.ContainsKey("reallydownload"))
+                {
+
+                    reallyDownload = true;
+
+                }
+
                 // determine if invalid module was given
                 if (!approvedModules.Contains(module))
                 {
@@ -176,6 +193,9 @@ namespace ADOKit
                         break;
                     case "getpermissions":
                         await Modules.Recon.GetPermissions.execute(credential, url, project);
+                        break;
+                    case "downloadbuildlogs":
+                        await Modules.Recon.DownloadBuildLogs.execute(credential, url, project, outfolder, reallyDownload);
                         break;
                     case "createpat":
                         await Modules.Persistence.CreatePAT.execute(credential, url);

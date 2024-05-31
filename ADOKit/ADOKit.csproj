@@ -78,6 +78,7 @@
     <Compile Include="Modules\Recon\GetGroupMembers.cs" />
     <Compile Include="Modules\Recon\GetPermissions.cs" />
     <Compile Include="Modules\Recon\ListGroup.cs" />
+    <Compile Include="Modules\Recon\DownloadBuildLogs.cs" />
     <Compile Include="Modules\Recon\ListProject.cs" />
     <Compile Include="Modules\Recon\ListRepo.cs" />
     <Compile Include="Modules\Recon\ListUser.cs" />
@@ -88,6 +89,8 @@
     <Compile Include="Modules\Recon\SearchRepo.cs" />
     <Compile Include="Modules\Recon\SearchUser.cs" />
     <Compile Include="Modules\Recon\Whoami.cs" />
+    <Compile Include="Objects\BuildLog.cs" />
+    <Compile Include="Objects\Build.cs" />
     <Compile Include="Objects\GroupVariable.cs" />
     <Compile Include="Objects\BuildVariable.cs" />
     <Compile Include="Objects\CodeResult.cs" />
@@ -107,6 +110,7 @@
     <Compile Include="Utilities\FileUtils.cs" />
     <Compile Include="Utilities\GroupUtils.cs" />
     <Compile Include="Utilities\PatUtils.cs" />
+    <Compile Include="Utilities\BuildUtils.cs" />
     <Compile Include="Utilities\PipelineUtils.cs" />
     <Compile Include="Utilities\ProjectUtils.cs" />
     <Compile Include="Utilities\RepoUtils.cs" />
