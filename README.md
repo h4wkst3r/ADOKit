@@ -150,14 +150,14 @@ Take the below steps to setup Visual Studio in order to compile the project your
 
 Below are the authentication options you have with ADOKit when authenticating to an Azure DevOps instance.
 
-* **Stolen Cookie** - This will be the `UserAuthentication` cookie on a user's machine for the `.dev.azure.com` domain.
+* **Stolen Cookie - UserAuthentication** - This will be the `UserAuthentication` cookie on a user's machine for the `.dev.azure.com` domain.
   * `/credential:UserAuthentication=ABC123`
+* **Stolen Cookie - AadAuthentication** - This will be the `AadAuthentication` cookie on a user's machine for the `.dev.azure.com` domain.
+  * `/credential:eyJ0...`
 * **Personal Access Token (PAT)** - This will be an access token/API key that will be a single string.
   * `/credential:apiToken`
-* **Stolen Access Token** - If you can steal or refresh a suitable access token you can also use it.
-  * `/credential:accessToken`
-
-Note: When using an access token, it must be valid for the resource Azure RM (i.e. "aud":"https://management.core.windows.net/").
+* **Stolen Access Token** - If you can steal or refresh a suitable access token you can also use it. When using an access token, it must be valid for the resource of Azure Resource Manager (ARM) - `"aud":"https://management.core.windows.net/"`
+  * `/credential:eyJ0..`
 
 ## Module Details Table
 The below table shows the permissions required for each module.
