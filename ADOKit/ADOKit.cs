@@ -19,7 +19,7 @@ namespace ADOKit
         private static string search = "";
         private static string id = "";
         private static string sshKey = "";
-        private static List<string> approvedModules = new List<string> { "check", "whoami", "listrepo", "searchrepo", "listproject", "searchproject", "searchcode", "searchfile", "listuser", "searchuser", "listgroup", "searchgroup", "getgroupmembers", "getpermissions", "createpat", "removepat", "listpat", "createsshkey", "removesshkey", "listsshkey", "addprojectadmin", "removeprojectadmin", "addbuildadmin", "removebuildadmin", "addcollectionadmin", "removecollectionadmin", "addcollectionbuildadmin", "removecollectionbuildadmin", "addcollectionbuildsvc", "removecollectionbuildsvc", "addcollectionsvc", "removecollectionsvc", "getpipelinevars", "getpipelinesecrets", "getvariablegroups", "getserviceconnections" };
+        private static List<string> approvedModules = new List<string> { "check", "whoami", "listrepo", "searchrepo", "listproject", "searchproject", "searchcode", "searchfile", "listuser", "searchuser", "listgroup", "searchgroup", "getgroupmembers", "getpermissions", "createpat", "removepat", "listpat", "createsshkey", "removesshkey", "listsshkey", "addprojectadmin", "removeprojectadmin", "addbuildadmin", "removebuildadmin", "addcollectionadmin", "removecollectionadmin", "addcollectionbuildadmin", "removecollectionbuildadmin", "addcollectionbuildsvc", "removecollectionbuildsvc", "addcollectionsvc", "removecollectionsvc", "getpipelinevars", "getpipelinesecrets", "getvariablegroups", "getserviceconnections", "creds", "getbuildlogs", "listbuildlogs", "searchbuildlogs", "listteam", "searchteam", "getteammembers" };
 
 
 
@@ -156,11 +156,23 @@ namespace ADOKit
                     case "searchcode":
                         await Modules.Recon.SearchCode.execute(credential, url, search);
                         break;
+                    case "creds":
+                        await Modules.Recon.Creds.execute(credential, url);
+                        break;
                     case "searchfile":
                         await Modules.Recon.SearchFile.execute(credential, url, search);
                         break;
                     case "listuser":
                         await Modules.Recon.ListUser.execute(credential, url);
+                        break;
+                    case "listteam":
+                        await Modules.Recon.ListTeam.execute(credential, url);
+                        break;
+                    case "searchteam":
+                        await Modules.Recon.SearchTeam.execute(credential, url, search);
+                        break;
+                    case "getteammembers":
+                        await Modules.Recon.GetTeamMembers.execute(credential, url, search);
                         break;
                     case "searchuser":
                         await Modules.Recon.SearchUser.execute(credential, url,search);
@@ -176,6 +188,15 @@ namespace ADOKit
                         break;
                     case "getpermissions":
                         await Modules.Recon.GetPermissions.execute(credential, url, project);
+                        break;
+                    case "getbuildlogs":
+                        await Modules.Recon.GetBuildLogs.execute(credential, url, project);
+                        break;
+                    case "listbuildlogs":
+                        await Modules.Recon.ListBuildLogs.execute(credential, url, project);
+                        break;
+                    case "searchbuildlogs":
+                        await Modules.Recon.SearchBuildLogs.execute(credential, url, project, search);
                         break;
                     case "createpat":
                         await Modules.Persistence.CreatePAT.execute(credential, url);

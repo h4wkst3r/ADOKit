@@ -9,7 +9,6 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using ADOKit.Objects;
 
-
 namespace ADOKit.Utilities
 {
     class PipelineUtils
@@ -43,7 +42,7 @@ namespace ADOKit.Utilities
                     // if cookie was provided
                     if (credentials.ToLower().Contains("userauthentication="))
                     {
-                        webRequest.Headers.Add("Cookie", "X-VSS-UseRequestRouting=True; " + credentials);
+                        webRequest.Headers.Add("Cookie", "AadAuthenticationSet=false; " + credentials);
 
                     }
 
@@ -130,9 +129,8 @@ namespace ADOKit.Utilities
         }
 
 
-
         // get a list of build variables from a project build definition
-        public static async Task<List<BuildVariable>> getBuildVars(string credentials, string buildDefURL)
+        public static async Task<List<BuildVariable>> getBuildVarsOrSecrets(string credentials, string buildDefURL, bool getSecrets)
         {
 
             // this is the list of build variables to return
@@ -161,7 +159,7 @@ namespace ADOKit.Utilities
                     // if cookie was provided
                     if (credentials.ToLower().Contains("userauthentication="))
                     {
-                        webRequest.Headers.Add("Cookie", "X-VSS-UseRequestRouting=True; " + credentials);
+                        webRequest.Headers.Add("Cookie", "AadAuthenticationSet=false; " + credentials);
 
                     }
 
@@ -178,87 +176,35 @@ namespace ADOKit.Utilities
                     var reader = new StreamReader(myWebResponse.GetResponseStream());
                     content = reader.ReadToEnd();
 
-
                     // parse the JSON output and display results
-                    JsonTextReader jsonResult = new JsonTextReader(new StringReader(content));
+                    dynamic jsonResult = JsonConvert.DeserializeObject(content);
 
-                    string propName = "";
-                    string name = "";
-                    string value = "";
-                    string propVarName = ""; // used to track whether we are in variables section
+                    string pipelineName = jsonResult.name;
+                    string variableName = "";
+                    string variableValue = "";
 
-
-                    // read the json results
-                    while (jsonResult.Read())
+                    // read the json results if there are some variables
+                    if (jsonResult.variables != null)
                     {
-                        switch (jsonResult.TokenType.ToString())
+                        foreach (var variable in jsonResult.variables)
                         {
-                            case "StartObject":
-                                break;
-                            case "EndObject":
-
-                                // add build variable to the list if it has all the attributes needed and we didn't already add it
-                                if (!doesBuildVariableAlreadyExist(name, value, buildVariables) && value != "" && name != "")
+                            variableName = variable.Name;
+                            variableValue = variable.Value.value;
+                            // don't add the same variable multiple times or empty vars
+                            if (variableValue != "" && !doesBuildVariableAlreadyExist(pipelineName, variableName, variableValue, buildVariables))
+                            {
+                                // only input either the var or the secret, not both
+                                if (variable.Value.isSecret == "true" && getSecrets)
                                 {
-                                    buildVariables.Add(new BuildVariable(name, value));
-
-                                    // reset values after build variable item has been added
-                                    buildDefURL = "";
-                                    name = "";
-                                    value = "";
+                                    buildVariables.Add(new BuildVariable(variableName, variableValue, pipelineName));
                                 }
-
-                                break;
-                            case "StartArray":
-                                break;
-                            case "EndArray":
-                                break;
-                            case "PropertyName":
-
-                                // at this point we know we are at start of variables section
-                                if (propName.Equals("variables"))
+                                else if (variable.Value.isSecret != "true" && !getSecrets)
                                 {
-                                    propVarName = jsonResult.Value.ToString();
-
+                                    buildVariables.Add(new BuildVariable(variableName, variableValue, pipelineName));
                                 }
-
-                                // at this point we know we are at end of variables so we can set it back to blank
-                                if (propName.Equals("properties"))
-                                {
-                                    propVarName = "";
-
-                                }
-
-                                propName = jsonResult.Value.ToString();
-
-                                // only get a variable name if we are in the variables block and it isn't a value
-                                if (propVarName != "")
-                                {
-
-                                    if(propName != "value")
-                                    {
-                                        name = jsonResult.Value.ToString();
-                                    }
-
-                                }
-                                break;
-                            case "String":
-
-                                // only print if we are in the variables block
-                                if (propVarName != "")
-                                {
-                                    value = jsonResult.Value.ToString();
-                                }
-                                break;
-                            case "Boolean":
-                                break;
-                            case "Date":
-                                break;
-                            default:
-                                break;
+                            }
 
                         }
-
                     }
 
                 }
@@ -275,169 +221,15 @@ namespace ADOKit.Utilities
             return buildVariables;
 
         }
-
-
-        // get a list of build secrets from a project build definition
-        public static async Task<List<BuildVariable>> getBuildSecrets(string credentials, string buildDefURL)
-        {
-
-            // this is the list of build variables to return
-            List<BuildVariable> buildVariables = new List<BuildVariable>();
-
-
-            // ignore SSL errors
-            ServicePointManager.ServerCertificateValidationCallback = delegate (object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) { return true; };
-            ServicePointManager.Expect100Continue = true;
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-
-            try
-            {
-
-
-                // web request to get all build variables for a build definition
-                HttpWebRequest webRequest = (HttpWebRequest)System.Net.WebRequest.Create(buildDefURL);
-                if (webRequest != null)
-                {
-
-                    // set header values
-                    webRequest.Method = "GET";
-                    webRequest.ContentType = "application/json";
-                    webRequest.UserAgent = "ADOKit-21e233d4334f9703d1a3a42b6e2efd38";
-
-                    // if cookie was provided
-                    if (credentials.ToLower().Contains("userauthentication="))
-                    {
-                        webRequest.Headers.Add("Cookie", "X-VSS-UseRequestRouting=True; " + credentials);
-
-                    }
-
-                    // otherwise PAT was provided
-                    else
-                    {
-                        webRequest.Headers.Add("Authorization", "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(":" + credentials)));
-                    }
-
-
-                    // get web response
-                    HttpWebResponse myWebResponse = (HttpWebResponse)await webRequest.GetResponseAsync();
-                    string content;
-                    var reader = new StreamReader(myWebResponse.GetResponseStream());
-                    content = reader.ReadToEnd();
-
-
-                    // parse the JSON output and display results
-                    JsonTextReader jsonResult = new JsonTextReader(new StringReader(content));
-
-                    string propName = "";
-                    string name = "";
-                    string value = "";
-                    string propVarName = ""; // used to track whether we are in variables section
-
-
-                    // read the json results
-                    while (jsonResult.Read())
-                    {
-                        switch (jsonResult.TokenType.ToString())
-                        {
-                            case "StartObject":
-                                break;
-                            case "EndObject":
-                                break;
-                            case "StartArray":
-                                break;
-                            case "EndArray":
-                                break;
-                            case "PropertyName":
-
-                                // at this point we know we are at start of variables section
-                                if (propName.Equals("variables"))
-                                {
-                                    propVarName = jsonResult.Value.ToString();
-
-                                }
-
-                                // at this point we know we are at end of variables so we can set it back to blank
-                                if (propName.Equals("properties"))
-                                {
-                                    propVarName = "";
-
-                                }
-
-                                propName = jsonResult.Value.ToString();
-
-                                // only get a variable name if we are in the variables block and it isn't a value
-                                if (propVarName != "")
-                                {
-
-                                    // if we have gotten to a build secret, then assign it appropriatelly
-                                    if(propName == "isSecret")
-                                    {
-                                        value = ""; // value is going to be null, so assign blank string
-
-                                        // add build secret to the list if it has all the attributes needed and we didn't already add it
-                                        if (!doesBuildVariableAlreadyExist(name, value, buildVariables) && value == "" && name != "")
-                                        {
-                                            buildVariables.Add(new BuildVariable(name, value));
-
-                                            // reset values after build secret item has been added
-                                            buildDefURL = "";
-                                            name = "";
-                                            value = "";
-                                        }
-                                    }
-
-                                    if (propName != "value" && propName != "isSecret")
-                                    {
-                                        name = jsonResult.Value.ToString();
-
-                                    }
-
-                                }
-                                break;
-                            case "String":
-
-                                // only print if we are in the variables block
-                                if (propVarName != "")
-                                {
-                                    value = jsonResult.Value.ToString();
-                                }
-                                
-                                break;
-                            case "Boolean":
-                                break;
-                            case "Date":
-                                break;
-                            default:
-                                break;
-
-                        }
-
-                    }
-
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("");
-                Console.WriteLine("[-] ERROR: " + ex.Message);
-                Console.WriteLine("");
-            }
-
-
-            return buildVariables;
-
-        }
-
 
         // determine whether we already have that build variable
-        public static bool doesBuildVariableAlreadyExist(string name, string value, List<BuildVariable> buildList)
+        public static bool doesBuildVariableAlreadyExist(string pipelineName, string name, string value, List<BuildVariable> buildList)
         {
             bool doesItExist = false;
 
             foreach (Objects.BuildVariable variable in buildList)
             {
-                if (variable.name.Equals(name) && variable.value.Equals(value))
+                if (variable.pipelineName.Equals(pipelineName) && variable.name.Equals(name) && variable.value.Equals(value))
                 {
                     doesItExist = true;
                 }
@@ -476,7 +268,7 @@ namespace ADOKit.Utilities
                     // if cookie was provided
                     if (credentials.ToLower().Contains("userauthentication="))
                     {
-                        webRequest.Headers.Add("Cookie", "X-VSS-UseRequestRouting=True; " + credentials);
+                        webRequest.Headers.Add("Cookie", "AadAuthenticationSet=false; " + credentials);
                     }
 
                     // otherwise PAT was provided

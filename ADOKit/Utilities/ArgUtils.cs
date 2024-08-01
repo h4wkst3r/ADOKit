@@ -46,7 +46,12 @@ namespace ADOKit.Utilities
 
             if (credential.ToLower().StartsWith("userauthentication="))
             {
-                authType = "Cookie";
+                authType = "User Authentication Cookie";
+
+            }
+            else if (credential.ToLower().StartsWith("eyj0"))
+            {
+                authType = "Azure Access Token";
 
             }
             else

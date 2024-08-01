@@ -44,7 +44,7 @@ namespace ADOKit.Utilities
                     // if cookie was provided
                     if (credentials.ToLower().Contains("userauthentication="))
                     {
-                        webRequest.Headers.Add("Cookie", "X-VSS-UseRequestRouting=True; " + credentials);
+                        webRequest.Headers.Add("Cookie", "AadAuthenticationSet=false; " + credentials);
 
                     }
 
@@ -144,7 +144,7 @@ namespace ADOKit.Utilities
                     // if cookie was provided
                     if (credentials.ToLower().Contains("userauthentication="))
                     {
-                        webRequest.Headers.Add("Cookie", "X-VSS-UseRequestRouting=True; " + credentials);
+                        webRequest.Headers.Add("Cookie", "AadAuthenticationSet=false; " + credentials);
 
                     }
 
@@ -228,7 +228,7 @@ namespace ADOKit.Utilities
             return projectList;
         }
 
-        
+
 
 
         // determine whether we already have a project in our list by the given unique URL for that project

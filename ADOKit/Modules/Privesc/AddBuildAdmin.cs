@@ -46,18 +46,14 @@ namespace ADOKit.Modules.Privesc
                     // iterate through the list of users and find our user. this is way to get the user descriptor.
                     foreach (Objects.User user in userList)
                     {
-                        //debug
-                        //Console.WriteLine("potential user match : " + user.directoryAlias.ToLower());
 
                         // if we have found our user, keep going to get the user descriptor and group descriptor
                         if (user.directoryAlias.ToLower().Equals(username.ToLower()))
                         {
-                            Console.WriteLine("Found user descriptor : " + user.directoryAlias.ToLower());
 
                             // fetch the user details so we can get the descriptor
                             Objects.User ourUser = await Utilities.UserUtils.getUserDetails(credential, url, user.descriptor, user.principalName);
                             userDescriptor = ourUser.descriptor;
-                            //Console.WriteLine("User descriptor: " + groupDescriptor);
 
                             // get a listing of groups for the project we are wanting to add our user to as a build admin
                             List<Objects.Group> groupList = await Utilities.GroupUtils.getGroupPermissionsForProject(credential, url, projectName);
@@ -65,12 +61,10 @@ namespace ADOKit.Modules.Privesc
                             // iterate through the list of groups for the project and get the descriptor for the build administrators group
                             foreach (Objects.Group group in groupList)
                             {
-                                //Console.WriteLine("potential group match : " + group.displayName.ToLower());
 
                                 if (group.displayName.ToLower().Equals("build administrators"))
                                 {
                                     groupDescriptor = group.descriptor;
-                                    Console.WriteLine("Found group descriptor: " + groupDescriptor);
 
                                 }
 
@@ -82,12 +76,12 @@ namespace ADOKit.Modules.Privesc
 
                     if (groupDescriptor == "")
                     {
-                        Console.WriteLine("[*] ERROR We didn't find a group descriptor - there wasn't a match. Stopping.");
+                        Console.WriteLine("[-] ERROR: We didn't find a group descriptor - there wasn't a match. Stopping.");
                         return;
                     }
                     if (userDescriptor == "")
                     {
-                        Console.WriteLine("[*] ERROR We didn't find a user descriptor - there wasn't a match. Stopping.");
+                        Console.WriteLine("[-] ERROR: We didn't find a user descriptor - there wasn't a match. Stopping.");
                         return;
                     }
 

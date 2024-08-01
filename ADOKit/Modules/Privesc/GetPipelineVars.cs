@@ -40,7 +40,7 @@ namespace ADOKit.Modules.Privesc
                     {
 
                         // create table header
-                        string tableHeader = string.Format("{0,30} | {1,30} | {2,50}", "Project Name", "Pipeline Var Name", "Pipeline Var Value");
+                        string tableHeader = string.Format("{0,30} | {1,30} | {2,30} | {3,50}", "Project Name", "Pipeline Name", "Pipeline Var Name", "Pipeline Var Value");
                         Console.WriteLine(tableHeader);
                         Console.WriteLine(new String('-', tableHeader.Length));
 
@@ -58,10 +58,10 @@ namespace ADOKit.Modules.Privesc
                             foreach (string buildUrl in buildDefinitionURLs)
                             {
 
-                                List<Objects.BuildVariable> variables = await Utilities.PipelineUtils.getBuildVars(credential, buildUrl);
+                                List<Objects.BuildVariable> variables = await Utilities.PipelineUtils.getBuildVarsOrSecrets(credential, buildUrl, false);
                                 foreach (Objects.BuildVariable var in variables)
                                 {
-                                    Console.WriteLine("{0,30} | {1,30} | {2,50}", proj.projectName, var.name, var.value);
+                                    Console.WriteLine("{0,30} | {1,30} | {2,30} | {3,50}", proj.projectName, var.pipelineName, var.name, var.value);
                                 }
                             }
 
@@ -76,7 +76,7 @@ namespace ADOKit.Modules.Privesc
                     else
                     {
                         // create table header
-                        string tableHeader = string.Format("{0,30} | {1,50}", "Pipeline Var Name", "Pipeline Var Value");
+                        string tableHeader = string.Format("{0,30} | {1,30} | {2,50}", "Pipeline Name", "Pipeline Var Name", "Pipeline Var Value");
                         Console.WriteLine(tableHeader);
                         Console.WriteLine(new String('-', tableHeader.Length));
 
@@ -87,10 +87,10 @@ namespace ADOKit.Modules.Privesc
                         foreach (string buildUrl in buildDefinitionURLs)
                         {
 
-                            List<Objects.BuildVariable> variables = await Utilities.PipelineUtils.getBuildVars(credential, buildUrl);
+                            List<Objects.BuildVariable> variables = await Utilities.PipelineUtils.getBuildVarsOrSecrets(credential, buildUrl, false);
                             foreach (Objects.BuildVariable var in variables)
                             {
-                                Console.WriteLine("{0,30} | {1,50}", var.name, var.value);
+                                Console.WriteLine("{0,30} | {1,30} | {2,50}", var.pipelineName, var.name, var.value);
                             }
                         }
 
