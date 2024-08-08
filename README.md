@@ -6,6 +6,9 @@ Azure DevOps Services Attack Toolkit - ADOKit is a toolkit that can be used to a
 
 Full details on the techniques used by ADOKit are in the X-Force Red [whitepaper](https://www.ibm.com/downloads/cas/5JKAPVYD).
 
+### Black Hat USA Arsenal 2024
+
+Presentation slides and demos are included in [BHUSA Arsenal 2024](BHUSA_Arsenal_2024/) folder in this repository.
 
 ## Release
 * Version 1.3 of ADOKit can be found in Releases
