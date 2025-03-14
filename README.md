@@ -29,6 +29,7 @@ Presentation slides and demos are included in [BHUSA Arsenal 2024](BHUSA_Arsenal
   - Recon
     - [Validate Azure DevOps Access](#validate-azure-devops-access)
     - [Whoami](#whoami)
+	- [List Orgs](#List-orgs)
     - [List Repos](#List-repos)
     - [Search Repos](#Search-repos)
     - [List Projects](#list-projects)
@@ -108,6 +109,7 @@ Take the below steps to setup Visual Studio in order to compile the project your
 * Recon
   * <b>check</b> - Check whether organization uses Azure DevOps and if credentials are valid
   * <b>whoami</b> - List the current user and its group memberships
+  * <b>listorgs</b> - List accessible or all organizations within Azure DevOps
   * <b>listrepo</b> - List all repositories
   * <b>searchrepo</b> - Search for given repository
   * <b>listproject</b> - List all projects
@@ -174,7 +176,7 @@ Below are the authentication options you have with ADOKit when authenticating to
   * `/credential:eyJ0...`
 * **Personal Access Token (PAT)** - This will be an access token/API key that will be a single string.
   * `/credential:apiToken`
-* **Stolen Access Token** - If you can steal or refresh a suitable access token you can also use it. When using an access token, it must be valid for the resource of Azure Resource Manager (ARM) - `"aud":"https://management.core.windows.net/"`
+* **Stolen Access Token** - If you can steal or refresh a suitable access token you can also use it. When using an access token, it must be valid for the resource of Azure Resource Manager (ARM) - `"aud":"https://management.core.windows.net/"` or Azure Devops - `"aud":"499b84ac-1321-427f-aa17-267ca6975798"`
   * `/credential:eyJ0..`
 
 ## Module Details Table
@@ -183,7 +185,8 @@ The below table shows the permissions required for each module.
 Attack Scenario | Module  | Special Permissions? | Notes
 --- |--- | --- | ---
 Recon | `check` |  No | 
-Recon | `whoami` |  No | 
+Recon | `whoami` |  No |
+Recon | `listorgs` |  No | 
 Recon | `listrepo` |  No | 
 Recon | `searchrepo` |  No | 
 Recon | `listproject` |  No | 
@@ -319,6 +322,41 @@ Timestamp:      4/4/2023 11:33:12 AM
            [YourOrganization]\Project Collection Administrators |                  Project Collection Administrators | Members of this application group can perform all privileged operations on the Team Project Collection.
 
 4/4/23 15:33:19 Finished execution of whoami
+
+```
+
+### List Orgs
+
+#### Use Case
+
+> *Retrieve organizations using a given access token. By default, only organizations accessible with the access token are listed. Use `/mode:aad` to list all DevOps organizations within the Azure AD tenant. Optionally, specify a custom AEX endpoint with `/endpoint:ENDPOINT_NAME`. Additional endpoints can be discovered by inspecting the "X-VSS-DeploymentAffinity" cookie from `aex.dev.azure.com`.*
+
+
+#### Syntax
+
+Provide the `listorgs` module, along with any relevant authentication information. This will output the current user and all of its group memberhips.
+
+`ADOKit.exe listorgs /credential:eyj0... [/mode:aad] [/endpoint:ENDPOINT_NAME]`
+
+#### Example Output
+
+```
+C:\>ADOKit.exe listorgs /credential:eyj0..."
+
+==================================================
+Module:         listorgs
+Auth Type:      Azure Access Token
+Target URL:     https://app.vssps.visualstudio.com                                                                                                                                                                                                                                                                                                Timestamp:      3/14/2025 2:26:45 PM
+==================================================                                                                                                                                                 
+
+[*] INFO: Checking credentials provided
+
+[+] SUCCESS: Credentials provided are VALID.
+
+                         Organization ID |                        Organization Name
+-----------------------------------------------------------------------------------
+    390a7474-e2f2-4b98-b538-4a547fa9f5e3 |                             solar-devops
+    b63b999f-43f2-48c5-998d-b31cbf4c2f8e |                             lunar-devops
 
 ```
 
