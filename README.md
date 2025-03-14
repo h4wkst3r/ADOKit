@@ -334,14 +334,20 @@ Timestamp:      4/4/2023 11:33:12 AM
 
 #### Syntax
 
-Provide the `listorgs` module, along with any relevant authentication information. By default, only organizations accessible with the access token are listed. Use `/mode:aad` to list all DevOps organizations within the Azure AD tenant. Optionally, specify a custom AEX endpoint with `/endpoint:ENDPOINT_NAME`. Additional endpoints can be discovered by inspecting the "X-VSS-DeploymentAffinity" cookie from `aex.dev.azure.com`.
+Provide the `listorgs` module with the required authentication information. By default, this command lists only the organizations accessible with the provided access token. 
 
-`ADOKit.exe listorgs /credential:eyj0... [/mode:aad] [/endpoint:ENDPOINT_NAME]`
+- Use **`/mode:aad`** to enumerate **all** DevOps organizations within the Azure AD tenant, regardless of direct access.
+- Use **`/endpoint:ENDPOINT_NAME`** to specify a custom AEX endpoint.  
+  - Additional endpoints can be identified by inspecting the `"X-VSS-DeploymentAffinity"` cookie from `aex.dev.azure.com`.
+
+`ADOKit.exe listorgs /credential:"eyj0..." [/mode:aad] [/endpoint:ENDPOINT_NAME]`
+
+`ADOKit.exe listorgs /credential:"eyj0..." /mode:aad /endpoint:aexprodeus21`
 
 #### Example Output
 
 ```
-C:\>ADOKit.exe listorgs /credential:eyj0..."
+C:\>ADOKit.exe listorgs /credential:"eyj0..."
 
 ==================================================
 Module:         listorgs
