@@ -29,7 +29,7 @@ Presentation slides and demos are included in [BHUSA Arsenal 2024](BHUSA_Arsenal
   - Recon
     - [Validate Azure DevOps Access](#validate-azure-devops-access)
     - [Whoami](#whoami)
-	- [List Orgs](#List-orgs)
+    - [List Orgs](#List-orgs)
     - [List Repos](#List-repos)
     - [Search Repos](#Search-repos)
     - [List Projects](#list-projects)
@@ -329,12 +329,12 @@ Timestamp:      4/4/2023 11:33:12 AM
 
 #### Use Case
 
-> *Retrieve organizations using a given access token. By default, only organizations accessible with the access token are listed. Use `/mode:aad` to list all DevOps organizations within the Azure AD tenant. Optionally, specify a custom AEX endpoint with `/endpoint:ENDPOINT_NAME`. Additional endpoints can be discovered by inspecting the "X-VSS-DeploymentAffinity" cookie from `aex.dev.azure.com`.*
+> *Retrieve organizations using a given access token.*
 
 
 #### Syntax
 
-Provide the `listorgs` module, along with any relevant authentication information. This will output the current user and all of its group memberhips.
+Provide the `listorgs` module, along with any relevant authentication information. By default, only organizations accessible with the access token are listed. Use `/mode:aad` to list all DevOps organizations within the Azure AD tenant. Optionally, specify a custom AEX endpoint with `/endpoint:ENDPOINT_NAME`. Additional endpoints can be discovered by inspecting the "X-VSS-DeploymentAffinity" cookie from `aex.dev.azure.com`.
 
 `ADOKit.exe listorgs /credential:eyj0... [/mode:aad] [/endpoint:ENDPOINT_NAME]`
 
@@ -346,7 +346,9 @@ C:\>ADOKit.exe listorgs /credential:eyj0..."
 ==================================================
 Module:         listorgs
 Auth Type:      Azure Access Token
-Target URL:     https://app.vssps.visualstudio.com                                                                                                                                                                                                                                                                                                Timestamp:      3/14/2025 2:26:45 PM
+Target URL:     https://app.vssps.visualstudio.com
+
+Timestamp:      3/14/2025 2:26:45 PM
 ==================================================                                                                                                                                                 
 
 [*] INFO: Checking credentials provided
