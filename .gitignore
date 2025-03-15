@@ -1,0 +1,10 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/ADOKit/.vs
+/ADOKit/bin/Debug
+/ADOKit/obj/Debug
+/.vs/ADOKit
+/packages
+*.user

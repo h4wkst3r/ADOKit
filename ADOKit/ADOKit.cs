@@ -19,7 +19,7 @@ namespace ADOKit
         private static string search = "";
         private static string id = "";
         private static string sshKey = "";
-        private static List<string> approvedModules = new List<string> { "check", "whoami", "listrepo", "searchrepo", "listproject", "searchproject", "searchcode", "searchfile", "listuser", "searchuser", "listgroup", "searchgroup", "getgroupmembers", "getpermissions", "createpat", "removepat", "listpat", "createsshkey", "removesshkey", "listsshkey", "addprojectadmin", "removeprojectadmin", "addbuildadmin", "removebuildadmin", "addcollectionadmin", "removecollectionadmin", "addcollectionbuildadmin", "removecollectionbuildadmin", "addcollectionbuildsvc", "removecollectionbuildsvc", "addcollectionsvc", "removecollectionsvc", "getpipelinevars", "getpipelinesecrets", "getvariablegroups", "getserviceconnections", "creds", "getbuildlogs", "listbuildlogs", "searchbuildlogs", "listteam", "searchteam", "getteammembers" };
+        private static List<string> approvedModules = new List<string> { "check", "whoami", "listorgs", "listrepo", "searchrepo", "listproject", "searchproject", "searchcode", "searchfile", "listuser", "searchuser", "listgroup", "searchgroup", "getgroupmembers", "getpermissions", "createpat", "removepat", "listpat", "createsshkey", "removesshkey", "listsshkey", "addprojectadmin", "removeprojectadmin", "addbuildadmin", "removebuildadmin", "addcollectionadmin", "removecollectionadmin", "addcollectionbuildadmin", "removecollectionbuildadmin", "addcollectionbuildsvc", "removecollectionbuildsvc", "addcollectionsvc", "removecollectionsvc", "getpipelinevars", "getpipelinesecrets", "getvariablegroups", "getserviceconnections", "creds", "getbuildlogs", "listbuildlogs", "searchbuildlogs", "listteam", "searchteam", "getteammembers" };
 
 
 
@@ -41,7 +41,7 @@ namespace ADOKit
                 module = args[0].ToLower(); // get the module by the first argument given
 
                 // if url is not set, display message and exit
-                if (!argDict.ContainsKey("url"))
+                if (!argDict.ContainsKey("url") && !module.Equals("listorgs"))
                 {
                     Console.WriteLine("");
                     Console.WriteLine("[-] ERROR: Must supply a URL. See the README.");
@@ -134,7 +134,9 @@ namespace ADOKit
                 // if all is good, proceed to run appropriate module
                 switch (module)
                 {
-
+                    case "listorgs":
+                        await Modules.Recon.ListOrgs.execute(credential, argDict);
+                        break;
                     case "check":
                         await Modules.Recon.Check.execute(credential, url);
                         break;
