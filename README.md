@@ -11,7 +11,7 @@ Full details on the techniques used by ADOKit are in the X-Force Red [whitepaper
 Presentation slides and demos are included in [BHUSA Arsenal 2024](BHUSA_Arsenal_2024/) folder in this repository.
 
 ## Release
-* Version 1.3 of ADOKit can be found in Releases
+* Version 1.4 of ADOKit can be found in Releases
 
 ## Table of Contents
 
