@@ -30,8 +30,11 @@ namespace ADOKit.Utilities
             try
             {
 
+                // hit a real API endpoint — bare org URL returns 203/302 on many tenants even with valid auth
+                string probeUrl = url.TrimEnd('/') + "/_apis/projects?api-version=7.0";
+
                 // web request to check auth and whether organization uses Azure DevOps
-                HttpWebRequest webRequest = (HttpWebRequest)System.Net.WebRequest.Create(url);
+                HttpWebRequest webRequest = (HttpWebRequest)System.Net.WebRequest.Create(probeUrl);
                 if (webRequest != null)
                 {
 
@@ -54,7 +57,7 @@ namespace ADOKit.Utilities
                         webRequest.Headers.Add("Authorization", "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(":" + credentials)));
                     }
 
-                    // dump webrequest headers for debug 
+                    // dump webrequest headers for debug
                     /*for (int i = 0; i < webRequest.Headers.Count; i++)
                     {
                         Console.WriteLine("[+] Request header : " + webRequest.Headers.Keys[i].ToString() + " / " + webRequest.Headers[i]);
